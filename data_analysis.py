@@ -32,6 +32,8 @@ for bacterium in bacterias_time[1500]:
 
 print(bacteria_gfp)
 
+
+# Extracting the spatial positions (x, y) as features for clustering
 positions = np.array([[float(bacterium[1]), float(bacterium[2])] for bacterium in bacteria_gfp])
 
 # DBSCAN clustering
@@ -63,21 +65,11 @@ print("\nCentroids of Clusters:")
 for cluster_id, centroid in centroids.items():
     print(f"Cluster {cluster_id} Centroid: {centroid}")
 
-# Calculate the distance between each pair of cluster centroids
-distances = {}
-cluster_ids = list(centroids.keys())
-
-for i in range(len(cluster_ids)):
-    for j in range(i + 1, len(cluster_ids)):
-        cluster_id_1 = cluster_ids[i]
-        cluster_id_2 = cluster_ids[j]
-        distance = euclidean(centroids[cluster_id_1], centroids[cluster_id_2])
-        distances[(cluster_id_1, cluster_id_2)] = distance
-
-# Print the distances between clusters
-print("\nDistances Between Clusters:")
-for cluster_pair, distance in distances.items():
-    print(f"Distance between Cluster {cluster_pair[0]} and Cluster {cluster_pair[1]}: {distance}")
+# List of centroid pairs to connect with lines
+pairs = [
+    (4, 2), (4, 3), (3, 2), (3, 6), (3, 5), (2, 1),
+    (2, 5), (5, 6), (1, 5), (5, 0), (5, 1), (1, 0)  # Added (1, 0) to the list
+]
 
 # Plot the clusters with centroids and Y-axis inverted
 plt.scatter(positions[:, 0], positions[:, 1], c=labels, cmap='viridis', label='Bacteria')
@@ -85,9 +77,19 @@ for cluster_id, centroid in centroids.items():
     plt.scatter(centroid[0], centroid[1], s=200, c='red', marker='X', label=f'Centroid {cluster_id}')
     plt.text(centroid[0], centroid[1], f'Centroid {cluster_id}', fontsize=12, color='red')
 
+# Draw lines between specified pairs of centroids
+for cluster_id_1, cluster_id_2 in pairs:
+    centroid_1 = centroids.get(cluster_id_1)
+    centroid_2 = centroids.get(cluster_id_2)
+    if centroid_1 is not None and centroid_2 is not None:
+        plt.plot([centroid_1[0], centroid_2[0]], [centroid_1[1], centroid_2[1]], 'k--', lw=2)  # 'k--' is a dashed black line
+        distance = euclidean(centroid_1, centroid_2)
+        plt.text((centroid_1[0] + centroid_2[0]) / 2, (centroid_1[1] + centroid_2[1]) / 2, 
+                 f'{distance:.2f}', fontsize=12, color='blue', ha='center')
+
 plt.xlabel('X')
 plt.ylabel('Y')
-plt.title('DBSCAN Clustering of GFP-Positive Bacteria with Centroids')
+plt.title('DBSCAN Clustering of GFP-Positive Bacteria with Centroids and Lines')
 plt.legend()
 plt.gca().invert_yaxis()
 plt.show()
