@@ -416,8 +416,13 @@ program main() :=  {
 	c_ecolis(1, 0, 0, 80, { "pEmisorGreen"}, program p());
 	c_ecolis(1, 0, 0, 80, { "pEmisorRed"}, program p());
 	c_ecolis(1000, 0, 0, 80, { "pRepLiderRed","pRepLiderGreen","pRepLiderYellow" ,"pLiders","pBand", "pDeads","pColors","pColorYellow","pColorGreen","pColorRed"}, program p());
+	t := 0;
 	//funciona entrega el valor de color RFP :o
-	true :{
-		dump_multiple(fp1,{ "colorRFP"},{ "colorGFP"},{ "colorYFP"});
+
+	true : { t := t + dt }
+	t > 300 : {
+		dump(fp1);
 	}
+
+
 };
